@@ -1082,3 +1082,582 @@ class uniqueOccurrencesSolution {
     }
 }
 debugPrint(uniqueOccurrencesSolution().uniqueOccurrences([3,2,2,1,1,1]))
+
+class maxProfitSolution {
+    func maxProfit(_ prices: [Int]) -> Int {
+     
+        var profitArray: [Int] = []
+        
+        for i in 1...prices.count-1 where prices[i] > prices[i-1] {
+            profitArray.append((prices[i] - prices[i-1]))
+        }
+        
+        profitArray.sort(by: >)
+        
+        if profitArray.count > 2 {
+            return profitArray[0]+profitArray[1]
+        } else if profitArray.count == 1 {
+            return profitArray[0]
+        } else {
+            return 0
+        }
+    }
+}
+
+//debugPrint(maxProfitSolution().maxProfit([1,2,3,4,5]))
+
+class distributeCandiesSolution {
+    func distributeCandies(_ candies: [Int]) -> Int {
+        var distData: [Int: Int] = [:]
+        var sister: [Int] = []
+        var brother: [Int] = []
+        
+        for candy in candies {
+            if distData[candy] != nil {
+                distData[candy] = distData[candy]! + 1
+            } else {
+                distData[candy] = 1
+            }
+        }
+        let sortedByValue = distData.sorted(by : {$0.value < $1.value})
+        
+        for (key,value) in sortedByValue {
+            for i in 0..<value {
+                if i%2 == 0 {
+                    sister.append(key)
+                } else {
+                    brother.append(key)
+                }
+            }
+        }
+        debugPrint(sister)
+        
+        return sister.count
+    }
+}
+
+//debugPrint(distributeCandiesSolution().distributeCandies([1,1,1,1,2,3]))
+
+class isToeplitzMatrixSolution {
+    func isToeplitzMatrix(_ matrix: [[Int]]) -> Bool {
+        
+    let rowCount = matrix.count
+    let columnCount = matrix[0].count
+        
+    let largerEdge  = max(rowCount, columnCount)
+    // let lowerLeftIndex = matrix[rowCount-1][0]
+    // let topRightIndex = matrix[0,columnCount-1]
+     
+    for i in 1..<largerEdge {
+      //1. Lower Edge
+        if i<rowCount && i<columnCount && matrix[(rowCount-1)-i][0] != matrix[rowCount-1][i] {
+            return false
+        }
+        
+        if i<columnCount && i<rowCount && matrix[0][(columnCount-1)-i] != matrix[i][columnCount-1] {
+            return false
+        }
+
+    }
+        return true
+        
+    }
+}
+
+debugPrint(isToeplitzMatrixSolution().isToeplitzMatrix([[22,0,94,45,46,96],[10,22,80,94,45,46]]))
+
+class numberOfLinesSolution {
+    func numberOfLines(_ widths: [Int], _ S: String) -> [Int] {
+        var lines:Int = 0
+        var currentSum: Int = 0
+        let baseIndex = "a".first!.asciiValue!
+        
+        for value in S {
+            let index = Int(value.asciiValue! - baseIndex)
+            currentSum += widths[index]
+            if currentSum > 100 {
+                currentSum = widths[index]
+                lines += 1
+            }
+        }
+        
+        return [lines+1, currentSum]
+        
+    }
+}
+//debugPrint(numberOfLinesSolution().numberOfLines([10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10], "abcdefghijklmnopqrstuvwxyz"))
+
+class commonCharsSolution {
+    func commonChars(_ A: [String]) -> [String] {
+        var result:[Character] = A[0].sorted()
+        
+        for i in 1..<A.count {
+            var currentStr = Array(A[i])
+            for i in (0..<result.count).reversed() {
+                let chr = result[i]
+                if !currentStr.contains(chr) {
+                    result.remove(at: i)
+                } else {
+                    if let strindex = currentStr.firstIndex(of: chr) {
+                        currentStr.remove(at: strindex)
+                    }
+                }
+            }
+        }
+        
+        return result.map({String($0)})
+    }
+}
+
+//debugPrint(commonCharsSolution().commonChars(["cool","lock","cook"]))
+
+class containsNearbyAlmostDuplicateSolution {
+    func containsNearbyAlmostDuplicate(_ nums: [Int], _ k: Int, _ t: Int) -> Bool {
+       let n =  nums.count
+       if nums.isEmpty || n < 2 {
+                  return false
+              }
+       
+        
+        for i in 0..<n {
+            for j in i+1..<min(i+1+k, n) {
+                if abs(nums[i] - nums[j]) <= t {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+}
+
+
+debugPrint(containsNearbyAlmostDuplicateSolution().containsNearbyAlmostDuplicate([1,2,1], 1, 1))
+
+class matrixReshapeSolution {
+    func matrixReshape(_ nums: [[Int]], _ r: Int, _ c: Int) -> [[Int]] {
+        
+        var result = Array(repeating: Array(repeating: 0, count: c), count: r)
+        var array: [Int] = []
+        var count: Int = 0
+        for row in nums {
+            array.append(contentsOf: row)
+        }
+        
+        if array.count != r*c {
+            return nums
+        }
+        
+        debugPrint(array)
+        for i in 0..<r {
+            for j in 0..<c {
+                result[i][j] = array[count]
+                count += 1
+            }
+        }
+        
+        return result
+    }
+}
+
+//debugPrint(matrixReshapeSolution().matrixReshape([[1,2],[3,4]],2,4))
+
+class numRookCapturesSolution {
+    func numRookCaptures(_ board: [[Character]]) -> Int {
+      let enemySet: [Character] = ["p","b","r"]
+      let friendlySet: [Character] = ["P","B","R"]
+      var result: Int = 0
+     
+        let rowc = board.count
+        let colc = board[0].count
+        
+      let rookie:Character = "R"
+        var rookieIndex :[Int] = []
+    outerloop: for (rowIndex,row) in board.enumerated() {
+            for (colIndex,value) in row.enumerated() {
+                if value == rookie {
+                    rookieIndex.append(rowIndex)
+                    rookieIndex.append(colIndex)
+                    break outerloop
+                }
+            }
+        }
+        
+        //center to left
+        for i in (0..<rookieIndex[1]).reversed() {
+            if board[rookieIndex[0]][i] == friendlySet[0] ||  board[rookieIndex[0]][i] == friendlySet[1] ||  board[rookieIndex[0]][i] == friendlySet[2] {
+                break
+            } else if board[rookieIndex[0]][i] == enemySet[0] ||  board[rookieIndex[0]][i] == enemySet[1] ||  board[rookieIndex[0]][i] == enemySet[2] {
+                result += 1
+                break
+            }
+        }
+
+        //center to right
+        let startIndexRight = rookieIndex[1]+1
+        
+        for i in startIndexRight..<colc {
+             if board[rookieIndex[0]][i] == friendlySet[0] ||  board[rookieIndex[0]][i] == friendlySet[1] ||  board[rookieIndex[0]][i] == friendlySet[2] {
+                 break
+             } else if board[rookieIndex[0]][i] == enemySet[0] ||  board[rookieIndex[0]][i] == enemySet[1] ||  board[rookieIndex[0]][i] == enemySet[2] {
+                 result += 1
+                 break
+             }
+         }
+        
+        
+      //center to top
+       for i in (0..<rookieIndex[0]).reversed() {
+           if board[i][rookieIndex[1]] == friendlySet[0] ||  board[i][rookieIndex[1]] == friendlySet[1] ||  board[i][rookieIndex[1]] == friendlySet[2] {
+               break
+           } else if board[i][rookieIndex[1]] == enemySet[0] ||  board[i][rookieIndex[1]] == enemySet[1] ||  board[i][rookieIndex[1]] == enemySet[2] {
+               result += 1
+                break
+           }
+       }
+        
+        //center to Bottom
+        let startIndexBottom = rookieIndex[0]+1
+        for i in startIndexBottom..<rowc {
+             if board[i][rookieIndex[1]] == friendlySet[0] ||  board[i][rookieIndex[1]] == friendlySet[1] ||  board[i][rookieIndex[1]] == friendlySet[2] {
+                 break
+             } else if board[i][rookieIndex[1]] == enemySet[0] ||  board[i][rookieIndex[1]] == enemySet[1] ||  board[i][rookieIndex[1]] == enemySet[2] {
+                 result += 1
+                break
+             }
+         }
+        
+        return result
+        
+    }
+}
+
+//debugPrint(numRookCapturesSolution().numRookCaptures([[".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".","."],[".",".",".","R",".",".",".","."],[".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".","."]]
+//))
+
+class mergeTwoListsSolution {
+    func mergeTwoLists(_ l1: ListNode?, _ l2: ListNode?) -> ListNode? {
+        var mergedList = ListNode(0)
+        var reference = mergedList
+       if l1 == nil {
+           return l2
+       }
+        if l2 == nil {
+            return l1
+        }
+        var l1 = l1
+        var l2 = l2
+        while l1 != nil && l2 != nil {
+            if l1!.val <= l2!.val {
+                reference.next = ListNode(l1!.val)
+                l1 = l1!.next
+            } else {
+                reference.next = ListNode(l2!.val)
+                l2 = l2!.next
+            }
+            reference = reference.next!
+        }
+        
+        return mergedList.next
+    }
+}
+
+let newNode1 = ListNode(1)
+newNode.next = ListNode(4)
+newNode.next = ListNode(5)
+newNode.next = ListNode(4)
+newNode.next = ListNode(5)
+
+let newNode2 = ListNode(1)
+newNode2.next = ListNode(2)
+newNode2.next = ListNode(3)
+newNode2.next = ListNode(6)
+
+//debugPrint(mergeTwoListsSolution().mergeTwoLists(newNode1, newNode2))
+
+class removeDuplicatesSolution {
+
+    func removeDuplicates(_ S: String) -> String {
+        var sArr = Array(S)
+        let sSet = Set(S)
+        if sSet.count == 1 {
+            return ""
+        } else if  Set(S).count == sArr.count {
+            return S
+        } else {
+            for i in (1..<sArr.count).reversed() {
+                if sArr[i] == sArr[i-1] {
+                    sArr.remove(at: i)
+                     sArr.remove(at: i-1)
+                }
+            }
+            return removeDuplicates(String(sArr))
+        }
+    }
+}
+
+debugPrint(removeDuplicatesSolution().removeDuplicates("aaaaaaaa"))
+
+// N = 3 (N > 1)
+//  0  1  2
+// |--|--|--|
+//0|S |X |X |
+// |--|--|--|
+//1|X |X |X |
+// |--|--|--|
+//2|X |X |E |
+// |--|--|--|
+
+class findNumberOfPathsSolution {
+    func findNumberOfPaths(N: Int) -> Int {
+        var queue: [(Int, Int)] = []
+        var paths: Int = 0
+
+        var matrix = Array(repeating: Array(repeating: "X", count: N), count: N)
+        matrix[0][0] = "S"
+        matrix[N-1][N-1] = "E"
+
+        queue.append((0,0))
+
+        while !queue.isEmpty {
+            let lastElement = queue.first!
+            queue.removeFirst()
+            //debugPrint("Ele: \(lastElement)")
+            if matrix[lastElement.0][lastElement.1] == "E" {
+                //ebugPrint("End - reached")
+                paths += 1
+            } else {
+                // check if coordinate is valid by adding 1 to each row/column
+                if lastElement.0+1 < N {
+                    queue.append((lastElement.0+1, lastElement.1))
+                }
+
+                if lastElement.1+1 < N {
+                    queue.append((lastElement.0, lastElement.1+1))
+                }
+            }
+
+        }
+
+        return paths
+    }
+}
+
+//debugPrint(findNumberOfPathsSolution().findNumberOfPaths(N: 4))
+
+class findNumberOfPathsSolutionDFS {
+        var paths: Int = 0
+        func findNumberOfPaths(N: Int) -> Int {
+            var matrix = Array(repeating: Array(repeating: "X", count: N), count: N)
+            matrix[0][0] = "S"
+            matrix[N-1][N-1] = "E"
+            dfs((0,0), N)
+            return paths
+        }
+        
+    func dfs(_ currentNode: (Int, Int), _ N: Int) {
+        
+        if currentNode.0 == N-1 && currentNode.1 == N-1 {
+            paths += 1
+        }
+        
+        //has left
+         if currentNode.0+1 < N {
+           dfs((currentNode.0+1, currentNode.1), N)
+        }
+        
+        //has right
+        if currentNode.1+1 < N {
+           dfs((currentNode.0, currentNode.1+1), N)
+        }
+    }
+}
+
+//debugPrint(findNumberOfPathsSolutionDFS().findNumberOfPaths(N: 4))
+
+class relativeSortArraySolution {
+    func relativeSortArray(_ arr1: [Int], _ arr2: [Int]) -> [Int] {
+        var dict:[Int:Int] = [:]
+        var result: [Int] = []
+        
+        for v in arr1 {
+            if dict[v] != nil {
+                dict[v] = dict[v]! + 1
+            } else {
+                dict[v] = 1
+            }
+        }
+        
+        for v in arr2 {
+            for _ in 1...dict[v]! {
+               result.append(v)
+           }
+            dict.removeValue(forKey: v)
+        }
+        var subResult: [Int] = []
+        
+        for (key,value) in dict {
+            for _ in 1...value {
+                subResult.append(key)
+            }
+        }
+        
+        result.append(contentsOf: subResult.sorted())
+        return result
+    }
+}
+//debugPrint(relativeSortArraySolution().relativeSortArray([2,3,1,3,2,4,6,7,9,2,19], [2,1,4,3,9,6]))
+
+class countPrimeSetBitsSolution {
+    func countPrimeSetBits(_ L: Int, _ R: Int) -> Int {
+        var result:Int = 0
+        for i in L...R {
+          var num = i
+          let bitSetsCount = countPrimeSetBits(&num)
+          if isPrime(bitSetsCount) {
+              result += 1
+          }
+        }
+        
+        return result
+    }
+    
+    func countPrimeSetBits(_ num: inout Int) -> Int {
+        var setBitsCount: Int = 0
+        while num != 1 {
+            if num%2 != 0 {
+                setBitsCount += 1
+                num = num - 1
+            }
+            num = num/2
+        }
+        return setBitsCount+1
+    }
+    
+  func isPrime(_ num: Int) -> Bool {
+    let sqr = Int(sqrt(Double(num)))
+   
+    if sqr == 1 { return true }
+    for i in 2...sqr where num%i == 0 {
+        return false
+    }
+    return true
+  }
+}
+
+//debugPrint(countPrimeSetBitsSolution().countPrimeSetBits(567, 607))
+class letterCasePermutationSolution {
+    
+    
+    func letterCasePermutation(_ S: String) -> [String] {
+      var currentIndex: Int = 0
+      let SArr = Array(S).map({String($0)})
+      var result: [String] = []
+      let sCount = SArr.count
+        
+        while currentIndex != sCount {
+            let currentString = SArr[currentIndex]
+            
+            if currentString.lowercased() != currentString.uppercased() {
+                var subResult = result
+                addInResult(currentString.lowercased(), result: &result)
+                addInResult(currentString.uppercased(), result: &subResult)
+                result.append(contentsOf: subResult)
+            } else {
+                addInResult(currentString, result: &result)
+            }
+            
+            currentIndex += 1
+        }
+        
+        return result
+    }
+    
+    func addInResult(_ str: String, result: inout [String]) {
+        if result.count == 0 {
+            result.append(str)
+        } else {
+            for i in 0..<result.count {
+                result[i] += str
+            }
+        }
+    }
+}
+
+//debugPrint(letterCasePermutationSolution().letterCasePermutation("abc"))
+
+class canAttendMeetingsSolution {
+//    func canAttendMeetings(_ intervals: [[Int]]) -> Bool {
+//        let sortedIntervals = intervals.sorted(by: {
+//            $0[0] < $1[0]
+//        })
+//
+//        for i in 0..<sortedIntervals.count-1 {
+//            if sortedIntervals[i][1] > sortedIntervals[i+1][0] {
+//                return false
+//            }
+//        }
+//    return true
+//    }
+    
+    func canAttendMeetings(_ intervals: [[Int]]) -> Bool {
+        guard intervals.count > 1 else { return true }
+        
+        var maxEnd = 0
+        for interval in intervals { maxEnd = max(maxEnd, interval[1]) }
+        debugPrint(maxEnd)
+        var bucket = [Int](repeating: 0, count: maxEnd+1)
+        for interval in intervals {
+            bucket[interval[0]] += 1
+            bucket[interval[1]] -= 1
+        }
+        debugPrint(bucket)
+        var count = 0
+        for i in 0...maxEnd {
+            count += bucket[i]
+            if count > 1 { return false }
+        }
+        
+        return true
+    }
+    
+}
+//debugPrint(canAttendMeetingsSolution().canAttendMeetings([[10,15],[5,15],[15,20]]))
+
+
+class countCharactersSolution {
+    func countCharacters(_ words: [String], _ chars: String) -> Int {
+
+        var result:Int = 0
+        var dict: [Character: Int] = [:]
+        
+        for c in chars {
+            dict[c] = (dict[c] ?? 0) + 1
+        }
+        
+        for word in words {
+           var newArr = dict
+           var allChrsAvailable: Bool = true
+           let wordCount: Int = word.count
+           for chr in word {
+                if newArr[chr] != nil {
+                    if newArr[chr]! == 1 {
+                        newArr.removeValue(forKey: chr)
+                    } else {
+                        newArr[chr] = newArr[chr]! - 1
+                    }
+                } else {
+                    allChrsAvailable = false
+                    break
+                }
+           }
+           
+            if allChrsAvailable {
+                result += wordCount
+            }
+            
+        }
+        return result
+    }
+}
+
+//debugPrint(countCharactersSolution().countCharacters(["hello","world","leetcode"], "welldonehoneyr"))
